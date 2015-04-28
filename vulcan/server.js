@@ -34,10 +34,8 @@ app.get('/', function(req, res) {
 });
 
 
-
+// handles the login request
 app.get('/login', function(req,res){
-
-
     // pull the form variables off the request body
     var username = req.query.username;
     var password = req.query.passwords;
@@ -45,8 +43,11 @@ app.get('/login', function(req,res){
 
     //generate our query string
     var queryString = "SELECT * FROM users WHERE username=\'"+username+"\' AND password = \'"+password+"\'";
+
+    //query
     connection.query(queryString, function(err, rows, fields) {
 
+        //Error check.
         if (rows.length==0)
         {
           res.render('pages/error',{
@@ -54,6 +55,10 @@ app.get('/login', function(req,res){
           });
           console.log("Error");
         }
+
+        // if rows is >0 this will be executed. Otherwise not.
+        // Technically you should check for rows.length ==1 but the random
+        // algo doesn't guarantee uniqueness so you may get multiple users.
         for (var i in rows) {
 
               //Get raw json
@@ -69,9 +74,6 @@ app.get('/login', function(req,res){
                   profile: profile
               });
         }
-
-
-
 
 
 });
