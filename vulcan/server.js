@@ -67,11 +67,11 @@ app.get('/login', function(req,res){
               var profile = JSON.parse(rawProfileJson);
               var uname = rows[i].username;
 
-              //res.json(200,{"result": "success"});
               console.log('Success! User Found');
+              
               res.render('pages/profile',{
-                  username: uname,
-                  profile: profile
+                  username: uname, //this is how you pass variables to ejs.
+                  profile: profile //read this variable in ejs by <%= profile %>
               });
         }
 
