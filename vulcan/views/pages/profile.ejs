@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/header %>
+    </header>
+
+    <main>
+        <h2> Profile Page </h2>
+        <div id="profile">
+            <p><b>Username</b> : <%= username %>    </p>
+            <p><b>Phone: </b> <%= profile.phone %>  </p>
+            <p><b>Email: </b> <%= profile.email %>  </p>
+            <p><b>Country</b> <%= profile.country %></p>
+        </div>
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>
