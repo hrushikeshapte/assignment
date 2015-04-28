@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var dbHelper = require('./dbHelper.js')
+var session = require('express-session');
+app.use(session({secret: 'ssshhhhh'}));
 
 app.use(bodyParser.urlencoded({
         extended: true
@@ -22,6 +24,7 @@ var connection = dbHelper.initializeConnection({
 });
 
 
+var sess;
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -30,7 +33,21 @@ app.set('view engine', 'ejs');
 
 // index page
 app.get('/', function(req, res) {
+    sess=req.session;
+    if(sess.username)
+    {
+        /*
+         * This line check Session existence.
+         * If it existed will do some action.
+         */
+        res.render('pages/profile',{
+            username: sess.username, //this is how you pass variables to ejs.
+            profile: sess.profile //read this variable in ejs by <%= profile %>
+        });
+    }
+    else{
     res.render('pages/index');
+    }
 });
 
 
@@ -39,7 +56,6 @@ app.get('/login', function(req,res){
     // pull the form variables off the request body
     var username = req.query.username;
     var password = req.query.passwords;
-
 
     //generate our query string
     var queryString = "SELECT * FROM users WHERE username=\'"+username+"\' AND password = \'"+password+"\'";
@@ -68,6 +84,12 @@ app.get('/login', function(req,res){
               var uname = rows[i].username;
 
               console.log('Success! User Found');
+
+            sess=req.session;
+//In this we are assigning email to sess.email variable.
+//email comes from HTML page.
+            sess.username= uname;
+            sess.profile = profile;
               
               res.render('pages/profile',{
                   username: uname, //this is how you pass variables to ejs.
@@ -79,6 +101,18 @@ app.get('/login', function(req,res){
 });
 
 
+});
+
+app.get('/logout', function(req, res) {
+    req.session.destroy(function(err){
+        if(err){
+            console.log(err);
+        }
+        else
+        {
+            res.redirect('/');
+        }
+    });
 });
 
 
