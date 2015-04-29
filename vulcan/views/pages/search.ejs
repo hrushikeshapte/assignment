@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/profile-header %>
+    </header>
+
+    <main>
+        <form name="search" method="get" action='/searchResults'>
+                    <ul>
+                        <li><label>Search</label>
+                            <input type="text" id="searchname" name="searchname" placeholder="search by name or phone" required></li>
+                            <input type="submit" value="Search"></li>
+                    </ul>
+                </form>
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>

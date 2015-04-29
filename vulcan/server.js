@@ -103,6 +103,50 @@ app.get('/login', function(req,res){
 
 });
 
+app.get('/search', function(req,res){
+    res.render('pages/search');
+});
+
+app.get('/searchResults', function(req, res) {
+    var search = req.query.searchname;
+    console.log(search);
+
+    var queryString = "SELECT * FROM users WHERE username=\'"+search+"\' OR profile -> phone=\'"+search+"\'";
+    console.log(queryString);
+    connection.query(queryString, function(err, rows, fields) {
+
+        //Error check.
+        if (rows.length==0)
+        {
+            res.render('pages/error',{
+                message: "User not found"
+            });
+            console.log("Error");
+        }
+
+        // if rows is >0 this will be executed. Otherwise not.
+        // Technically you should check for rows.length ==1 but the random
+        // algo doesn't guarantee uniqueness so you may get multiple users.
+        for (var i in rows) {
+
+            //Get raw json
+            var rawProfileJson = rows[i].profile;
+            //Process it.
+            var profile = JSON.parse(rawProfileJson);
+            var uname = rows[i].username;
+
+            console.log('Success! User Found');
+
+            res.render('pages/profile',{
+                username: uname, //this is how you pass variables to ejs.
+                profile: profile //read this variable in ejs by <%= profile %>
+            });
+        }
+
+
+    });
+});
+
 app.get('/logout', function(req, res) {
     req.session.destroy(function(err){
         if(err){
