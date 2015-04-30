@@ -110,8 +110,16 @@ app.get('/search', function(req,res){
 app.get('/searchResults', function(req, res) {
     var search = req.query.searchname;
     console.log(search);
+    var category = req.query.searchdropdown;
+    var queryString;
 
-    var queryString = "SELECT * FROM users WHERE username=\'"+search+"\' OR profile -> phone=\'"+search+"\'";
+    if(category == "phone"){
+        queryString = "SELECT * FROM users WHERE profile LIKE \"%\"\""+category +"\"\":"+search+"%\"" ;
+    }
+    else{
+        queryString = "SELECT * FROM users WHERE profile LIKE \"%\"\""+category +"\"\": \"\""+search+"\"\"%\"" ;
+    }
+
     console.log(queryString);
     connection.query(queryString, function(err, rows, fields) {
 

@@ -13,6 +13,10 @@
         <form name="search" method="get" action='/searchResults'>
                     <ul>
                         <li><label>Search</label>
+                        <select name="searchdropdown">
+                        <option value="phone">Phone</option>
+                        <option value="email">Email</option>
+                        </select>
                             <input type="text" id="searchname" name="searchname" placeholder="search by name or phone" required></li>
                             <input type="submit" value="Search"></li>
                     </ul>
