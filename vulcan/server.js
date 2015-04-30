@@ -167,6 +167,46 @@ app.get('/logout', function(req, res) {
     });
 });
 
+app.get('/edit', function(req,res){
+    res.render('pages/edit',{
+        username: sess.username,
+         profile: sess.profile//this is how you pass variables to ejs.
+    });
+});
+
+app.get('/editProfile', function(req,res){
+    var phone = req.query.phone;
+    var email = req.query.email;
+    var country = req.query.country;
+
+    var profile = new Object();
+    profile.phone = phone;
+    profile.email = email;
+    profile.country = country;
+
+    var profileJson = JSON.stringify(profile);
+    console.log(profileJson);
+
+    var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE username = '"+sess.username+"'";
+
+    connection.query(queryString, function(err, rows, fields) {
+        if (rows.length==0)
+        {
+            res.render('pages/error',{
+                message: "User not authorized"
+            });
+            console.log("Error");
+        }
+
+        else{
+            res.render('pages/profile',{
+                username: sess.username, //this is how you pass variables to ejs.
+                profile: profile //read this variable in ejs by <%= profile %>
+            });
+        }
+    });
+});
+
 
 app.listen(8080);
 console.log('8080 is the magic port');

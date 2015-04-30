@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/profile-header %>
+    </header>
+
+    <main>
+        <h2> Edit Profile </h2>
+        <div id="edit-profile">
+         <form name="edit" method="get" action='/editProfile'>
+            <p><b>Username</b> : <%= username %>    </p>
+            <p><b>Phone: </b> <input type="tel" id="phone" name="phone" placeholder="phone" value=<%= profile.phone %>></p>
+            <p><b>Email: </b> <input type="email" id="email" name="email" placeholder="email" value=<%= profile.email %>></p>
+            <p><b>Country</b> <input type="text" id="country" name="country" placeholder="country" value=<%= profile.country %>></p>
+            <input type="submit" value="Edit">
+         </form>
+        </div>
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>
