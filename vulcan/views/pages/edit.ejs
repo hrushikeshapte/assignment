@@ -4,7 +4,8 @@
     <% include ../partials/head %>
 
 <script>
- $(document).on('click', function(event){
+$(document).ready(function() {
+ $("#test").click(function(){
    console.log("here");
    var socket = io.connect('http://localhost:8080/');
      socket.on('connect',function(){
@@ -12,8 +13,9 @@
      });
 
      socket.on('news', function(msg) {
-       alert('News from server: ' + msg.hello);
+       alert(msg.user + ' updated his profile');
      });
+});
 });
 </script>
 
@@ -28,13 +30,13 @@
         <h2> Edit Profile </h2>
         <div id="edit-profile">
          <form name="edit" method="get" action='/editProfile'>
-            <p><b>Username</b> : <%= username %>    </p>
+            <p id="username" name="username"><b>Username</b> : <%= username %>    </p>
             <p><b>Phone: </b> <input type="tel" id="phone" name="phone" placeholder="phone" value=<%= profile.phone %>></p>
             <p><b>Email: </b> <input type="email" id="email" name="email" placeholder="email" value=<%= profile.email %>></p>
             <p><b>Country</b> <input type="text" id="country" name="country" placeholder="country" value=<%= profile.country %>></p>
             <input type="submit" value="Edit" id="add_status">
          </form>
-          <input type="submit" value="Test Socket" id="button">
+            <input type="submit" value="test socket" id="test">
         </div>
     </main>
 

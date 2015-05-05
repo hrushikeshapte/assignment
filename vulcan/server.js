@@ -1,8 +1,8 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var dbHelper = require('./dbHelper.js')
-var session = require('cookie-session')
+var dbHelper = require('./dbHelper.js');
+var session = require('cookie-session');
 app.use(session({secret: 'ssshhhhh'}));
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
@@ -26,9 +26,8 @@ var connection = dbHelper.initializeConnection({
 });
 
 io.on('connection',function(socket){
-    console.log("A user is connected");
     socket.on('message', function (data) {
-        socket.emit('news', { hello: 'world' });
+        socket.broadcast.emit('news', { user: sess.username });
     });
 });
 
@@ -164,15 +163,8 @@ app.get('/searchResults', function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
-    req.session.destroy(function(err){
-        if(err){
-            console.log(err);
-        }
-        else
-        {
-            res.redirect('/');
-        }
-    });
+    req.session = null;
+    res.redirect('/');
 });
 
 app.get('/edit', function(req,res){
@@ -184,6 +176,7 @@ app.get('/edit', function(req,res){
 
 //var add_status = function (status,callback) {
 app.get('/editProfile', function(req,res){
+
     var phone = req.query.phone;
     var email = req.query.email;
     var country = req.query.country;
