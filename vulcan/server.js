@@ -26,8 +26,14 @@ var connection = dbHelper.initializeConnection({
 });
 
 io.on('connection',function(socket){
-    socket.on('message', function (data) {
-        socket.broadcast.emit('news', { user: sess.username });
+    socket.emit('message', 'You are connected!');
+    // The other clients are told that someone new has arrived
+    socket.broadcast.emit('message', 'Another client has just connected!');
+    socket.on('message', function (message) {
+        // The username of the person who clicked is retrieved from the session variables
+        socket.broadcast.emit('message', 'Updated profile');
+        console.log(sess.username + ' is speaking to me! They\'re saying: ' + message);
+
     });
 });
 

@@ -1,3 +1,17 @@
+<script>
+$(document).ready(function() {
+
+var socket = io.connect('http://localhost:8080/');
+
+socket.on('message', function(message) {
+                alert('The server has a message for you: ' + message);
+            })
+ $("#test").click(function(){
+   socket.emit('message', 'Hi server, how are you?');
+});
+});
+</script>
+
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
 
