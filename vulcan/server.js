@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var dbHelper = require('./dbHelper.js')
 var session = require('express-session');
 app.use(session({secret: 'ssshhhhh'}));
+var http = require('http').Server(app);
+var io = require("socket.io")(http);
 
 app.use(bodyParser.urlencoded({
         extended: true
@@ -23,6 +25,12 @@ var connection = dbHelper.initializeConnection({
     database : "vulcandb"
 });
 
+io.on('connection',function(socket){
+    console.log("A user is connected");
+    socket.on('message', function (data) {
+        socket.emit('news', { hello: 'world' });
+    });
+});
 
 var sess;
 
@@ -174,6 +182,7 @@ app.get('/edit', function(req,res){
     });
 });
 
+//var add_status = function (status,callback) {
 app.get('/editProfile', function(req,res){
     var phone = req.query.phone;
     var email = req.query.email;
@@ -192,13 +201,16 @@ app.get('/editProfile', function(req,res){
     connection.query(queryString, function(err, rows, fields) {
         if (rows.length==0)
         {
+  //          callback(false);
             res.render('pages/error',{
                 message: "User not authorized"
             });
+    //        callback(false);
             console.log("Error");
         }
 
         else{
+      //      callback(true);
             res.render('pages/profile',{
                 username: sess.username, //this is how you pass variables to ejs.
                 profile: profile //read this variable in ejs by <%= profile %>
@@ -206,7 +218,8 @@ app.get('/editProfile', function(req,res){
         }
     });
 });
+//}
 
 
-app.listen(8080);
+http.listen(8080);
 console.log('8080 is the magic port');
