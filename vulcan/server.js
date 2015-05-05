@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var dbHelper = require('./dbHelper.js')
-var session = require('express-session');
+var session = require('cookie-session')
 app.use(session({secret: 'ssshhhhh'}));
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
