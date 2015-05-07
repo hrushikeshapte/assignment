@@ -120,13 +120,11 @@ app.get('/search', function(req,res){
 
 app.get('/searchResults', function(req, res) {
     var search = req.query.searchname;
-    console.log(search);
     var category = req.query.searchdropdown;
     var queryString;
 
     queryString = "SELECT * FROM users WHERE profile LIKE \"%\"\""+category +"\"\":\"\""+search+"\"\"%\"" ;
 
-    console.log(queryString);
     connection.query(queryString, function(err, rows, fields) {
 
         //Error check.
@@ -135,7 +133,6 @@ app.get('/searchResults', function(req, res) {
             res.render('pages/error',{
                 message: "User not found"
             });
-            console.log("Error");
         }
 
         // if rows is >0 this will be executed. Otherwise not.
@@ -148,8 +145,6 @@ app.get('/searchResults', function(req, res) {
             //Process it.
             var profile = JSON.parse(rawProfileJson);
             var uname = rows[i].username;
-
-            console.log('Success! User Found');
 
             res.render('pages/profile',{
                 username: uname, //this is how you pass variables to ejs.
@@ -173,7 +168,6 @@ app.get('/edit', function(req,res){
     });
 });
 
-//var add_status = function (status,callback) {
 app.get('/editProfile', function(req,res){
 
     var phone = req.query.phone;
@@ -186,23 +180,18 @@ app.get('/editProfile', function(req,res){
     profile.country = country;
 
     var profileJson = JSON.stringify(profile);
-    console.log(profileJson);
 
     var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE username = '"+sess.username+"'";
 
     connection.query(queryString, function(err, rows, fields) {
         if (rows.length==0)
         {
-  //          callback(false);
             res.render('pages/error',{
                 message: "User not authorized"
             });
-    //        callback(false);
-            console.log("Error");
         }
 
         else{
-      //      callback(true);
             res.render('pages/profile',{
                 username: sess.username, //this is how you pass variables to ejs.
                 profile: profile //read this variable in ejs by <%= profile %>
@@ -210,8 +199,6 @@ app.get('/editProfile', function(req,res){
         }
     });
 });
-//}
-
 
 http.listen(8080);
-console.log('8080 is the magic port');
+
