@@ -1,31 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <% include ../partials/head %>
-</head>
-<body class="container">
-
-    <header>
-        <% include ../partials/profile-header %>
-    </header>
+<% include ../partials/head %>
+<% include ../partials/profile-header %>
 
     <main>
         <form name="search" method="get" action='/searchResults'>
-                    <ul>
-                        <li><label>Search</label>
+
+                        <p><label>Search</label>
                         <select name="searchdropdown">
                         <option value="phone">Phone</option>
                         <option value="email">Email</option>
                         </select>
                             <input type="text" id="searchname" name="searchname" placeholder="search by name or phone" required></li>
-                            <input type="submit" value="Search"></li>
-                    </ul>
+                            <input type="submit" value="Search"></p>
+
                 </form>
     </main>
 
-    <footer>
-        <% include ../partials/footer %>
-    </footer>
-
-</body>
-</html>
+<% include ../partials/footer %>

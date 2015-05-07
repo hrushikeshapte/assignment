@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <% include ../partials/head %>
-</head>
-<body class="container">
+<% include ../partials/head %>
+ <% include ../partials/header %>
 
-    <header>
-        <% include ../partials/header %>
-    </header>
+<main>
 
-    <main>
         <form name="login" method="get" action='/login'>
 
                         <p><label>Username</label>
@@ -19,11 +12,6 @@
                         <p>
                             <input type="submit" value="Login"></p>
                 </form>
-    </main>
+</div>
 
-    <footer>
-        <% include ../partials/footer %>
-    </footer>
-    
-</body>
-</html>
+<% include ../partials/footer %>
