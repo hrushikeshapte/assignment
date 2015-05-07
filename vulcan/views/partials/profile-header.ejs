@@ -1,37 +1,37 @@
 <header>
 
-<script>
-$(document).ready(function() {
+         <script>
+         $(document).ready(function() {
 
-var socket = io.connect('http://localhost:8080/');
+         var socket = io.connect('http://localhost:8080/');
 
-socket.on('message', function(message) {
-                alert('' + message);
-            })
- $("#add_status").click(function(){
-   socket.emit('message', 'Hi server, how are you?');
-});
-});
-</script>
+         socket.on('message', function(message) {
+                         alert('' + message);
+                     })
+          $("#add_status").click(function(){
+            socket.emit('message', 'Hi server, how are you?');
+         });
+         });
+         </script>
 
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
+         <nav class="navbar navbar-default" role="navigation">
+             <div class="container-fluid">
 
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">
-                <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
-                Vulcan Coding Challenge
-            </a>
-        </div>
+                 <div class="navbar-header">
+                     <a class="navbar-brand" href="#">
+                         <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
+                         Vulcan Coding Challenge
+                     </a>
+                 </div>
 
-        <ul class="nav navbar-nav">
-            <li><a href="/">Profile</a></li>
-             <li><a href="/search">Search</a></li>
-             <li><a href="/edit">Edit Profile</a></li>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
+                 <ul class="nav navbar-nav">
+                     <li><a href="/showProfile">Profile</a></li>
+                      <li><a href="/search">Search</a></li>
+                      <li><a href="/edit">Edit Profile</a></li>
+                     <li><a href="/logout">Logout</a></li>
+                 </ul>
 
-    </div>
-</nav>
+             </div>
+         </nav>
 
-</header>
+         </header>

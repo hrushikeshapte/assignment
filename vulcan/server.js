@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var dbHelper = require('./dbHelper.js');
-var session = require('cookie-session');
+var session = require('express-session');
 app.use(session({secret: 'ssshhhhh'}));
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 
 
+var sess;
 
 
 //Creating a connection & instantiating it for use.
@@ -35,7 +36,6 @@ io.on('connection',function(socket){
     });
 });
 
-var sess;
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -44,20 +44,25 @@ app.set('view engine', 'ejs');
 
 // index page
 app.get('/', function(req, res) {
-    sess=req.session;
-    if(sess.username)
+
+    if (res.session)
     {
-        /*
-         * This line check Session existence.
-         * If it existed will do some action.
-         */
-        res.render('pages/profile',{
-            username: sess.username, //this is how you pass variables to ejs.
-            profile: sess.profile //read this variable in ejs by <%= profile %>
-        });
+        sess=req.session;
+        console.log(sess.id);
+        if(sess.id)
+        {
+
+            /*
+             * This line check Session existence.
+             * If it existed will do some action.
+             */
+            res.redirect('/showProfile?id='+sess.id);
+        }
+
     }
+
     else{
-    res.render('pages/index');
+        res.render('pages/index');
     }
 });
 
@@ -67,6 +72,8 @@ app.get('/login', function(req,res){
     // pull the form variables off the request body
     var username = req.query.username;
     var password = req.query.passwords;
+
+    sess=req.session;
 
     //generate our query string
     var queryString = "SELECT * FROM users WHERE username=\'"+username+"\' AND password = \'"+password+"\'";
@@ -92,20 +99,18 @@ app.get('/login', function(req,res){
               var rawProfileJson = rows[i].profile;
               //Process it.
               var profile = JSON.parse(rawProfileJson);
-              var uname = rows[i].username;
+              var id = rows[i].id;
+               console.log(id);
+            sess.username = username;
+            console.log(sess.username);
 
-              console.log('Success! User Found');
+            console.log('Success! User Found');
 
-            sess=req.session;
+
 //In this we are assigning email to sess.email variable.
 //email comes from HTML page.
-            sess.username= uname;
-            sess.profile = profile;
-              
-              res.render('pages/profile',{
-                  username: uname, //this is how you pass variables to ejs.
-                  profile: profile //read this variable in ejs by <%= profile %>
-              });
+            sess.idd= id;
+              res.redirect('/showProfile?id='+id);
         }
 
 
@@ -145,6 +150,52 @@ app.get('/searchResults', function(req, res) {
             //Process it.
             var profile = JSON.parse(rawProfileJson);
             var uname = rows[i].username;
+            var id = rows[i].id;
+            //req.params.id = id;
+
+           res.redirect('/showProfile?id='+id);
+        }
+
+
+    });
+});
+
+app.get('/showProfile', function(req,res){
+
+
+    var id;
+    if(req.query.id){
+         id = req.query.id;
+        console.log("got query id="+id);
+    }
+    else{
+        sess=req.session;
+        id = sess.idd;
+        console.log("got session id="+id);
+    }
+    console.log(id);
+    queryString = "SELECT * FROM users WHERE id = '"+id+"'" ;
+
+    connection.query(queryString, function(err, rows, fields) {
+
+        //Error check.
+        if (rows.length==0)
+        {
+            res.render('pages/error',{
+                message: "User not found"
+            });
+        }
+
+        // if rows is >0 this will be executed. Otherwise not.
+        // Technically you should check for rows.length ==1 but the random
+        // algo doesn't guarantee uniqueness so you may get multiple users.
+        for (var i in rows) {
+
+            //Get raw json
+            var rawProfileJson = rows[i].profile;
+            //Process it.
+            var profile = JSON.parse(rawProfileJson);
+            var uname = rows[i].username;
 
             res.render('pages/profile',{
                 username: uname, //this is how you pass variables to ejs.
@@ -154,18 +205,51 @@ app.get('/searchResults', function(req, res) {
 
 
     });
+
 });
 
 app.get('/logout', function(req, res) {
-    req.session = null;
-    res.redirect('/');
+    req.session.destroy(function(err){
+        if(err){
+            console.log(err);
+        }
+        else
+        {
+            res.redirect('/');
+        }
+    });
 });
 
 app.get('/edit', function(req,res){
-    res.render('pages/edit',{
-        username: sess.username,
-         profile: sess.profile//this is how you pass variables to ejs.
+    var queryString = "SELECT * from users where id = '"+sess.idd+"'";
+    connection.query(queryString, function(err, rows, fields) {
+        if (rows.length==0)
+        {
+
+            res.render('pages/error',{
+                message: "User not authorized"
+            });
+        }
+
+        else{
+            for (var i in rows) {
+
+                //Get raw json
+                var rawProfileJson = rows[i].profile;
+                //Process it.
+                var profile = JSON.parse(rawProfileJson);
+                var uname = rows[i].username;
+
+            }
+
+            res.render('pages/edit',{
+                username: uname,
+                profile: profile//this is how you pass variables to ejs.
+            });
+
+        }
     });
+
 });
 
 app.get('/editProfile', function(req,res){
@@ -181,21 +265,25 @@ app.get('/editProfile', function(req,res){
 
     var profileJson = JSON.stringify(profile);
 
-    var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE username = '"+sess.username+"'";
+    var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE id = '"+sess.idd+"'";
+
+    sess.profile = profile;
 
     connection.query(queryString, function(err, rows, fields) {
         if (rows.length==0)
         {
+
             res.render('pages/error',{
                 message: "User not authorized"
             });
         }
 
         else{
-            res.render('pages/profile',{
-                username: sess.username, //this is how you pass variables to ejs.
-                profile: profile //read this variable in ejs by <%= profile %>
-            });
+            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+            res.header('Expires', '-1');
+            res.header('Pragma', 'no-cache');
+
+            res.redirect('/showProfile?id='+sess.idd);
         }
     });
 });
