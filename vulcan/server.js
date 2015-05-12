@@ -27,11 +27,7 @@ var connection = dbHelper.initializeConnection({
 });
 
 io.on('connection',function(socket){
-  //  socket.emit('message', 'You are connected!');
-    // The other clients are told that someone new has arrived
-  //  socket.broadcast.emit('message', 'Another client has just connected!');
     socket.on('message', function (message) {
-        // The username of the person who clicked is retrieved from the session variables
         socket.broadcast.emit('message',sess.username + ' Updated profile');
     });
 });
@@ -39,8 +35,6 @@ io.on('connection',function(socket){
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
-
-// use res.render to load up an ejs view file
 
 // index page
 app.get('/', function(req, res) {
@@ -90,32 +84,19 @@ app.get('/login', function(req,res){
           console.log("Error");
         }
 
-        // if rows is >0 this will be executed. Otherwise not.
-        // Technically you should check for rows.length ==1 but the random
-        // algo doesn't guarantee uniqueness so you may get multiple users.
         for (var i in rows) {
 
-              //Get raw json
-              var rawProfileJson = rows[i].profile;
-              //Process it.
-              var profile = JSON.parse(rawProfileJson);
               var id = rows[i].id;
                console.log(id);
             sess.username = username;
-            console.log(sess.username);
 
             console.log('Success! User Found');
 
-
-//In this we are assigning email to sess.email variable.
-//email comes from HTML page.
-            sess.idd= id;
+            sess.userId= id;
               res.redirect('/showProfile?id='+id);
         }
 
-
 });
-
 
 });
 
@@ -128,34 +109,26 @@ app.get('/searchResults', function(req, res) {
     var category = req.query.searchdropdown;
     var queryString;
 
-    queryString = "SELECT * FROM users WHERE profile LIKE \"%\"\""+category +"\"\":\"\""+search+"\"\"%\"" ;
+    queryString = "SELECT db_id from phone_index where "+category+" = \'"+search+"\'";
 
+    console.log(queryString);
     connection.query(queryString, function(err, rows, fields) {
 
         //Error check.
         if (rows.length==0)
         {
-            res.render('pages/error',{
+            res.render('pages/error-profile',{
                 message: "User not found"
             });
         }
 
-        // if rows is >0 this will be executed. Otherwise not.
-        // Technically you should check for rows.length ==1 but the random
-        // algo doesn't guarantee uniqueness so you may get multiple users.
         for (var i in rows) {
+             var dbID = rows[i].db_id;
 
-            //Get raw json
-            var rawProfileJson = rows[i].profile;
-            //Process it.
-            var profile = JSON.parse(rawProfileJson);
-            var uname = rows[i].username;
-            var id = rows[i].id;
-            //req.params.id = id;
+           res.redirect('/showProfile?id='+dbID);
 
-           res.redirect('/showProfile?id='+id);
+
         }
-
 
     });
 });
@@ -170,7 +143,7 @@ app.get('/showProfile', function(req,res){
     }
     else{
         sess=req.session;
-        id = sess.idd;
+        id = sess.userId;
         console.log("got session id="+id);
     }
     console.log(id);
@@ -186,9 +159,6 @@ app.get('/showProfile', function(req,res){
             });
         }
 
-        // if rows is >0 this will be executed. Otherwise not.
-        // Technically you should check for rows.length ==1 but the random
-        // algo doesn't guarantee uniqueness so you may get multiple users.
         for (var i in rows) {
 
             //Get raw json
@@ -198,11 +168,10 @@ app.get('/showProfile', function(req,res){
             var uname = rows[i].username;
 
             res.render('pages/profile',{
-                username: uname, //this is how you pass variables to ejs.
-                profile: profile //read this variable in ejs by <%= profile %>
+                username: uname,
+                profile: profile
             });
         }
-
 
     });
 
@@ -221,12 +190,12 @@ app.get('/logout', function(req, res) {
 });
 
 app.get('/edit', function(req,res){
-    var queryString = "SELECT * from users where id = '"+sess.idd+"'";
+    var queryString = "SELECT * from users where id = '"+sess.userId+"'";
     connection.query(queryString, function(err, rows, fields) {
         if (rows.length==0)
         {
 
-            res.render('pages/error',{
+            res.render('pages/error-profile',{
                 message: "User not authorized"
             });
         }
@@ -244,7 +213,7 @@ app.get('/edit', function(req,res){
 
             res.render('pages/edit',{
                 username: uname,
-                profile: profile//this is how you pass variables to ejs.
+                profile: profile
             });
 
         }
@@ -265,7 +234,7 @@ app.get('/editProfile', function(req,res){
 
     var profileJson = JSON.stringify(profile);
 
-    var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE id = '"+sess.idd+"'";
+    var queryString = "UPDATE users SET profile='"+ profileJson +"'  WHERE id = '"+sess.userId+"'";
 
     sess.profile = profile;
 
@@ -273,7 +242,7 @@ app.get('/editProfile', function(req,res){
         if (rows.length==0)
         {
 
-            res.render('pages/error',{
+            res.render('pages/error-profile',{
                 message: "User not authorized"
             });
         }
@@ -283,7 +252,7 @@ app.get('/editProfile', function(req,res){
             res.header('Expires', '-1');
             res.header('Pragma', 'no-cache');
 
-            res.redirect('/showProfile?id='+sess.idd);
+            res.redirect('/showProfile?id='+sess.userId);
         }
     });
 });
